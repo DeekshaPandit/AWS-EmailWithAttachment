@@ -1,0 +1,46 @@
+--- 
+name: testemailService
+cosine: AIQ Cloud test Email Service
+BinaryMediaTypes:
+  - multipart/form-data
+
+lambdas: 
+  testEmail:
+    Handler: handlers/email.handler
+    Runtime: nodejs10.x
+    Timeout: 29
+    MemorySize: 256
+
+endpoints:
+  /v1/email/contact:
+    post:
+      tags:
+        - "testemailService"
+      operationId: testEmail
+      summary: "Sends emails based on the event type."
+      description: |
+        Sends emails based on the event type.
+      produces: 
+        - "application/json"
+      parameters:
+        - name: "body"
+          in: "body"
+          required: true
+          schema:
+            $ref: "#/definitions/+subscriptionEmail"
+      responses:
+        "200":
+          description: "Successful Request."
+      x-amazon-apigateway-integration:
+        lambda: testEmail
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        type: "aws_proxy"
+definitions:
+  subscriptionEmail:
+    type: object
+    properties:
+      subject:
+        type: string
+    required:
+      - subject
